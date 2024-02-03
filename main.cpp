@@ -2,6 +2,7 @@
 // February 2024
 
 #include <iostream>
+#include "philo.h"
 using namespace std;
 
 int main() {

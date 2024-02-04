@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Vix/OneDrive/Desktop/PhilosophersAlgorithm",
-      "program": "c:/Users/Vix/OneDrive/Desktop/PhilosophersAlgorithm/build/Debug/outDebug",
+      "cwd": "c:/Users/Manuel/Documents/git/PhilosophersAlgorithm",
+      "program": "c:/Users/Manuel/Documents/git/PhilosophersAlgorithm/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

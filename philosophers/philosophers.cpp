@@ -1,31 +1,34 @@
 #include "PhiloHeader.h"
 
-thread philosopher_creator(int philosophers)
+thread philosopher_creator(pthread_t philosophers)
 {
-	for (int i = 0; i < philosophers; i++)
-	{
-		thread* philosopher = new thread;
-	}
+	pthread_create(philosophers, NULL, philosopher_function, philosophers);
 }
 
-thread philosopher_sleep(thread philosopher) {
-	this_thread::sleep_for(chrono::seconds(1));
+void philosopher_function(pthread_t philosopher) {
+	//this_thread::sleep_for(chrono::seconds(1));
+	int id = ((int)arg); // Convertir el argumento a un entero
+
+	cout << "Hola desde el hilo " << id << "!" << endl;
+
+	pthread_exit(NULL); // Terminar el hilo
 }
 
 int main(int argc, char **argv)
 {
-	//Handle the number of arguments
-	if (argc != 5 || argc != 6) {
+	pthread_t philosopher1;
+
+	// Handle the number of arguments
+	if (argc != 5 || argc != 6)
+	{
 		cerr << RED << "The program does not have the correct number of arguments. Try again." << endl;
 		return 0;
 	}
-	
 
-	//thread thread1(funcion, "hilo 1\n");
-	//thread thread2(funcion, "hilo 2\n");
-	//thread1.join();
-	//thread2.join();
-	//si
-	//la vix manda
+	for(int i = 0; i <= argv[1]; i++){
+		pthread_t philosopher[i] = new pthread_t;
+		philosopher_creator(philosopher[i]);
+	}
+
 	return 0;
 }

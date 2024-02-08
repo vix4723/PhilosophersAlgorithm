@@ -1,34 +1,31 @@
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <thread>
+#include "PhiloHeader.h"
 
-using namespace std;
-
-void funcion(const char *str)
+thread philosopher_creator(int philosophers)
 {
-	while (1)
+	for (int i = 0; i < philosophers; i++)
 	{
-		cout << str;
-		this_thread::sleep_for(chrono::seconds(1));
+		thread* philosopher = new thread;
 	}
 }
 
-void funcion2(const int num)
-{
-	while (1)
-	{
-		cout << num;
-		this_thread::sleep_for(chrono::seconds(1));
-	}
+thread philosopher_sleep(thread philosopher) {
+	this_thread::sleep_for(chrono::seconds(1));
 }
 
-int main(int arg, char **argv)
+int main(int argc, char **argv)
 {
-	thread thread1(funcion, "hilo 1\n");
-	thread thread2(funcion, "hilo 2\n");
-	thread1.join();
-	thread2.join();
+	//Handle the number of arguments
+	if (argc != 5 || argc != 6) {
+		cerr << RED << "The program does not have the correct number of arguments. Try again." << endl;
+		return 0;
+	}
+	
+
+	//thread thread1(funcion, "hilo 1\n");
+	//thread thread2(funcion, "hilo 2\n");
+	//thread1.join();
+	//thread2.join();
+	//si
 	//la vix manda
 	return 0;
 }

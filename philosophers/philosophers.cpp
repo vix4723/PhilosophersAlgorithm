@@ -16,8 +16,13 @@ void* philo_tasks(void* arg)
 		usleep(1000000); // Sleep for 1 second
 
 		// Attempt to pick up forks
-		pthread_mutex_lock(&mutex[left_fork]);
-		pthread_mutex_lock(&mutex[right_fork]);
+		if (id % 2 == 0) {
+			pthread_mutex_lock(&mutex[left_fork]);
+			pthread_mutex_lock(&mutex[right_fork]);
+		} else {
+			pthread_mutex_lock(&mutex[right_fork]);
+			pthread_mutex_lock(&mutex[left_fork]);
+		}
 
 		// Eating
 		std::cout << "Philosopher " << id << " is eating." << std::endl;
@@ -33,7 +38,6 @@ void* philo_tasks(void* arg)
 
 int main(int argc, char **argv)
 {
-	int time_to_die = 5000, time_to_eat = 1000, time_to_sleep = 1000;
 	int num_fork[num_philo];
 	pthread_t philo[num_philo];
 
@@ -43,10 +47,12 @@ int main(int argc, char **argv)
 	}
 
 	//Creating the threads
-	for (int i = 1; i < num_philo; i++){
+	for (int i = 0; i < num_philo; i++){
 		num_fork[i] = i;
 		pthread_create(&philo[i], NULL, philo_tasks, &num_fork[i]);
 	}
+
+	sleep(10);
 
 	// Join the threads
 	for (int i = 0; i < num_philo; i++) {
@@ -55,7 +61,7 @@ int main(int argc, char **argv)
 
 	for(int i = 0; i < num_philo; i++) {
 	//Destruyendo los mutex
-	pthread_mutex_destroy(&mutex[i]);
+		pthread_mutex_destroy(&mutex[i]);
 	}
 
 	return 0;

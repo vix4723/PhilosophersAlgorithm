@@ -13,9 +13,10 @@ pthread_mutex_t forks[NUM_PHILOSOPHERS];
 pthread_t philosophers[NUM_PHILOSOPHERS];
 int eat_counter[NUM_PHILOSOPHERS] = {0};
 pthread_mutex_t eat_counter_mutex;
-bool philosopher_dead[NUM_PHILOSOPHERS] = {false};
 pthread_mutex_t print_mutex;
+bool philosopher_dead[NUM_PHILOSOPHERS] = {false};
 
+//function that prints the state of the philosopher at a given time
 void print_state(int philosopher_id, const string &state)
 {
 	auto now = chrono::system_clock::now();
@@ -34,7 +35,7 @@ void *philosopher(void *arg)
 	int first_fork = (philosopher_id == NUM_PHILOSOPHERS - 1) ? right_fork : left_fork;
 	int second_fork = (philosopher_id == NUM_PHILOSOPHERS - 1) ? left_fork : right_fork;
 
-	for (int i = 0; i < NUM_EAT_COUNT && !philosopher_dead[philosopher_id]; ++i)
+	for (int i = 0; i < NUM_EAT_COUNT && !philosopher_dead[philosopher_id]; i++)
 	{
 		// Thinking
 		print_state(philosopher_id, "is thinking");
@@ -43,6 +44,7 @@ void *philosopher(void *arg)
 		// Pick up forks
 		pthread_mutex_lock(&forks[first_fork]);
 		print_state(philosopher_id, "has taken a fork");
+		//Tries to lock it if the fork is available (unlocked)
 		if (pthread_mutex_trylock(&forks[second_fork]) != 0)
 		{
 			pthread_mutex_unlock(&forks[first_fork]);
@@ -54,16 +56,17 @@ void *philosopher(void *arg)
 		print_state(philosopher_id, "is eating");
 		sleep(1);
 
-		// Release forks
+		// Releases both forks
 		pthread_mutex_unlock(&forks[first_fork]);
 		pthread_mutex_unlock(&forks[second_fork]);
 
-		// Increment eat counter
+		// Increment eat counter until it reaches 5
 		pthread_mutex_lock(&eat_counter_mutex);
 		eat_counter[philosopher_id]++;
 		pthread_mutex_unlock(&eat_counter_mutex);
 	}
 
+	//if the philosopher dies
 	if (!philosopher_dead[philosopher_id])
 	{
 		print_state(philosopher_id, "died");
@@ -101,6 +104,8 @@ int main()
 		pthread_join(philosophers[i], NULL);
 	}
 
+	//This Part destroys all of the mutexes
+
 	// Destroy mutexes
 	for (int i = 0; i < NUM_PHILOSOPHERS; ++i)
 	{
@@ -113,6 +118,7 @@ int main()
 	// Destroy print mutex
 	pthread_mutex_destroy(&print_mutex);
 
+	//The program finishes
 	cout << "All philosophers are happy and have eaten" << endl;
 
 	return 0;

@@ -1,68 +1,85 @@
-#include "PhiloHeader.h"
+#include <iostream>
+#include <pthread.h>
+#include <unistd.h>
 
-const int num_philo = 5;
-pthread_mutex_t mutex[num_philo];
+#define NUM_PHILOSOPHERS 5
+#define NUM_EAT_COUNT 5
 
-void* philo_tasks(void* arg)
+using namespace std;
+
+pthread_mutex_t forks[NUM_PHILOSOPHERS];
+pthread_t philosophers[NUM_PHILOSOPHERS];
+int eat_counter[NUM_PHILOSOPHERS] = {0};
+pthread_mutex_t eat_counter_mutex;
+
+void *philosopher(void *arg)
 {
-	int id = *((int *)arg);
-	int left_fork = id;
-	int right_fork = (id + 1) % num_philo;
+	int philosopher_id = *((int *)arg);
+	int left_fork = philosopher_id;
+	int right_fork = (philosopher_id + 1) % NUM_PHILOSOPHERS;
 
-	while (true)
+	for (int i = 0; i < NUM_EAT_COUNT; ++i)
 	{
 		// Thinking
-		std::cout << "Philosopher " << id << " is thinking." << std::endl;
-		usleep(1000000); // Sleep for 1 second
+		cout << "Philosopher " << philosopher_id << " is thinking." << endl;
+		sleep(1);
 
-		// Attempt to pick up forks
-		if (id % 2 == 0) {
-			pthread_mutex_lock(&mutex[left_fork]);
-			pthread_mutex_lock(&mutex[right_fork]);
-		} else {
-			pthread_mutex_lock(&mutex[right_fork]);
-			pthread_mutex_lock(&mutex[left_fork]);
-		}
+		// Pick up/Lock forks
+		pthread_mutex_lock(&forks[left_fork]);
+		pthread_mutex_lock(&forks[right_fork]);
 
 		// Eating
-		std::cout << "Philosopher " << id << " is eating." << std::endl;
-		usleep(1000000); // Sleep for 1 second
+		cout << "Philosopher " << philosopher_id << " is eating." << endl;
+		sleep(1);
 
-		// Release forks
-		pthread_mutex_unlock(&mutex[left_fork]);
-		pthread_mutex_unlock(&mutex[right_fork]);
+		// Release/Unlock forks
+		pthread_mutex_unlock(&forks[left_fork]);
+		pthread_mutex_unlock(&forks[right_fork]);
+
+		// Increment eat counter
+		pthread_mutex_lock(&eat_counter_mutex);
+		eat_counter[philosopher_id]++;
+		pthread_mutex_unlock(&eat_counter_mutex);
 	}
 
 	return NULL;
 }
 
-int main(int argc, char **argv)
+int main()
 {
-	int num_fork[num_philo];
-	pthread_t philo[num_philo];
-
-	//Inicializando los mutex
-	for(int i = 0; i < num_philo; i++) {
-		pthread_mutex_init(&mutex[i], NULL);
+	// Initialize mutexes for each fork
+	for (int i = 0; i < NUM_PHILOSOPHERS; ++i)
+	{
+		pthread_mutex_init(&forks[i], NULL);
 	}
 
-	//Creating the threads
-	for (int i = 0; i < num_philo; i++){
-		num_fork[i] = i;
-		pthread_create(&philo[i], NULL, philo_tasks, &num_fork[i]);
+	// Initialize eat counter mutex
+	pthread_mutex_init(&eat_counter_mutex, NULL);
+
+	// Create philosopher threads
+	int philosopher_ids[NUM_PHILOSOPHERS];
+	for (int i = 0; i < NUM_PHILOSOPHERS; ++i)
+	{
+		philosopher_ids[i] = i;
+		pthread_create(&philosophers[i], NULL, philosopher, &philosopher_ids[i]);
 	}
 
-	sleep(10);
-
-	// Join the threads
-	for (int i = 0; i < num_philo; i++) {
-        pthread_join(philo[i], NULL);
-    }
-
-	for(int i = 0; i < num_philo; i++) {
-	//Destruyendo los mutex
-		pthread_mutex_destroy(&mutex[i]);
+	// Join philosopher threads
+	for (int i = 0; i < NUM_PHILOSOPHERS; ++i)
+	{
+		pthread_join(philosophers[i], NULL);
 	}
+
+	// Destroy mutexes
+	for (int i = 0; i < NUM_PHILOSOPHERS; ++i)
+	{
+		pthread_mutex_destroy(&forks[i]);
+	}
+
+	// Destroy eat counter mutex
+	pthread_mutex_destroy(&eat_counter_mutex);
+
+	cout << "All philosophers are happy and have eaten" << endl;
 
 	return 0;
 }

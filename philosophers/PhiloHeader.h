@@ -1,11 +1,9 @@
-#pragma once
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <pthread.h>
 #include <mutex>
-
-#define RED     "\033[31m"      /* Red */
+#include <chrono>
+#include <vector>
+#include <cstdlib>
+#include <unistd>
 
 using namespace std;
